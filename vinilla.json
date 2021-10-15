@@ -1,0 +1,11 @@
+{
+    "name": "Orm",
+    "vendor": "CodingLiki",
+    "description": "",
+    "repo_url": "",
+    "version": "0.0.1",
+    "depends_on": [
+        "CodingLiki/QueryBuilder",
+        "CodingLiki/OoAutoloader"
+    ]
+}
