@@ -2,7 +2,7 @@
     "name": "Orm",
     "vendor": "CodingLiki",
     "description": "",
-    "repo_url": "",
+    "repo_url": "https://github.com/coding-liki/Orm",
     "version": "0.0.1",
     "depends_on": [
         "CodingLiki/QueryBuilder",
