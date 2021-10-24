@@ -6,6 +6,7 @@
     "version": "0.0.1",
     "depends_on": [
         "CodingLiki/QueryBuilder",
-        "CodingLiki/OoAutoloader"
+        "CodingLiki/OoAutoloader",
+        "CodingLiki/DbModule"
     ]
 }
