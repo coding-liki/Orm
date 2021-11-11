@@ -6,6 +6,7 @@ use CodingLiki\Orm\BaseModel;
 use CodingLiki\Orm\EntityManager\EntityManagerContainer;
 use CodingLiki\Orm\EntityManager\Exceptions\EmptyResultFromDb;
 use CodingLiki\Orm\EntityManager\Exceptions\NotFullPrimaryKey;
+use CodingLiki\Orm\EntityManager\Exceptions\NotManagedNamespaceException;
 use CodingLiki\Orm\EntityManager\Exceptions\NotOneFieldInResultFromDb;
 use CodingLiki\Orm\EntityManager\Exceptions\NotOneResultFromDb;
 use CodingLiki\Orm\EntityManager\Traits\QueryParamsTrait;
@@ -20,14 +21,14 @@ class BaseQuery implements ModelQueryInterface
     use QueryParamsTrait;
 
     private QueryBuilder $queryBuilder;
-    private array $usedModelClasses = [];
-    private string $baseModelClass;
+    private array        $usedModelClasses = [];
+    private string       $baseModelClass;
 
     public function find(string $modelClass): static
     {
-        $this->queryBuilder = new QueryBuilder();
+        $this->queryBuilder     = new QueryBuilder();
         $this->usedModelClasses = [$modelClass];
-        $this->baseModelClass = $modelClass;
+        $this->baseModelClass   = $modelClass;
 
         $this->queryBuilder->select($modelClass . '.*')->from($modelClass);
 
@@ -50,11 +51,11 @@ class BaseQuery implements ModelQueryInterface
 
         $forWhere = [];
         foreach ($pkArray as $number => $pkField) {
-            $value = $identifier[$number] ?? $identifier[$pkField];
+            $value      = $identifier[$number] ?? $identifier[$pkField];
             $fieldNames = ModelHelper::getModelFields($this->baseModelClass);
 
             $fullFieldName = $this->baseModelClass . '.' . $fieldNames[$pkField]->fieldName;
-            $forWhere[] = RuleExpressionBuilder::equal($fullFieldName, $this->addParam($pkField, $value));
+            $forWhere[]    = RuleExpressionBuilder::equal($fullFieldName, $this->addParam($pkField, $value));
         }
 
         return $this->where($forWhere);
@@ -104,11 +105,10 @@ class BaseQuery implements ModelQueryInterface
      */
     public function all(): array
     {
-        $query = $this->queryBuilder->getRaw();
+        $query         = $this->queryBuilder->getRaw();
         $entityManager = EntityManagerContainer::get($this->baseModelClass);
 
         $entitiesData = $entityManager->executeQuery($query, $this->usedModelClasses, $this->usedParams)->getAllRows();
-
 
         $result = [];
         foreach ($entitiesData as $data) {
@@ -118,30 +118,34 @@ class BaseQuery implements ModelQueryInterface
         return $result;
     }
 
-    public function one(): BaseModel
+    /**
+     * @throws EmptyResultFromDb
+     * @throws NotOneResultFromDb
+     * @throws NotManagedNamespaceException
+     */
+    public function one(bool $strict = false): ?BaseModel
     {
-        $entityData = $this->getOneResult();
-        $entityManager = EntityManagerContainer::get($this->baseModelClass);
+        $entityData = $this->getOneResult($strict);
 
-        return $entityManager->persistEntityFromArray($this->baseModelClass, $entityData);
+        return empty($entityData) ? NULL : EntityManagerContainer::get($this->baseModelClass)->persistEntityFromArray($this->baseModelClass, $entityData);
     }
 
-    private function getOneResult(): array
+    private function getOneResult(bool $strict = false): array
     {
-        $query = $this->queryBuilder->getRaw();
+        $query         = $this->queryBuilder->getRaw();
         $entityManager = EntityManagerContainer::get($this->baseModelClass);
 
         $entitiesData = $entityManager->executeQuery($query, $this->usedModelClasses, $this->usedParams)->getAllRows();
 
-        if (count($entitiesData) === 0) {
+        if (count($entitiesData) === 0 && $strict) {
             throw new EmptyResultFromDb($query);
         }
 
-        if (count($entitiesData) > 1) {
+        if (count($entitiesData) > 1 && $strict) {
             throw new NotOneResultFromDb($query);
         }
 
-        return $entitiesData[0];
+        return $entitiesData[0] ?? [];
     }
 
     public function scalar()
@@ -243,32 +247,33 @@ class BaseQuery implements ModelQueryInterface
         return RuleExpressionBuilder::in($left, $in);
     }
 
-    public  function inRight(string|Expression $in): Expression
+    public function inRight(string|Expression $in): Expression
     {
         return RuleExpressionBuilder::inRight($in);
     }
 
-    public  function like(string|Expression $left, string|Expression $like, bool $caseInsensitive = false): Expression
+    public function like(string|Expression $left, string|Expression $like, bool $caseInsensitive = false): Expression
     {
         $left = $this->appendBaseClassToFieldName($left);
 
         return RuleExpressionBuilder::like($left, $like, $caseInsensitive);
     }
 
-    public  function between(string|Expression $left, string|Expression $start, string|Expression $end): Expression
+    public function between(string|Expression $left, string|Expression $start, string|Expression $end): Expression
     {
         $left = $this->appendBaseClassToFieldName($left);
 
         return RuleExpressionBuilder::between($left, $start, $end);
     }
 
-    public  function not(string|Expression $expression): Expression
+    public function not(string|Expression $expression): Expression
     {
         return RuleExpressionBuilder::not($expression);
     }
 
     /**
      * @param string|Expression $left
+     *
      * @return Expression|string
      */
     private function appendBaseClassToFieldName(string|Expression $left): Expression|string

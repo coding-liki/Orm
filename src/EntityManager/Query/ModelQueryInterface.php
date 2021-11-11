@@ -1,4 +1,5 @@
 <?php
+
 namespace CodingLiki\Orm\EntityManager\Query;
 
 use CodingLiki\Orm\BaseModel;
@@ -13,7 +14,7 @@ interface ModelQueryInterface
 
     public function orWhere(array $where): static;
 
-    public function limit(int $limit, ?int $offset = null): static;
+    public function limit(int $limit, ?int $offset = NULL): static;
 
     public function offset(int $offset): static;
 
@@ -24,7 +25,7 @@ interface ModelQueryInterface
      */
     public function all(): array;
 
-    public function one(): BaseModel;
+    public function one(bool $strict = false): ?BaseModel;
 
     public function scalar();
 

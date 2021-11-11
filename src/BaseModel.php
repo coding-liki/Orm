@@ -4,12 +4,13 @@ namespace CodingLiki\Orm;
 
 use CodingLiki\Orm\EntityManager\EntityManagerContainer;
 use CodingLiki\Orm\EntityManager\EntityState;
+use CodingLiki\Orm\EntityManager\Query\BaseQuery;
 use CodingLiki\Orm\EntityManager\Query\ModelQueryInterface;
 use CodingLiki\Orm\Helper\ModelHelper;
 use CodingLiki\Orm\Normalizer\CamelCaseToSnakeCaseNormalizer;
 use CodingLiki\Orm\Normalizer\StringNormalizerInterface;
 
-class BaseModel
+abstract class BaseModel
 {
     protected static ?string $queryClass               = NULL;
     protected ?string        $tableName                = NULL;
@@ -69,9 +70,12 @@ class BaseModel
 
         $em->persist($this, EntityState::STATE_NEED_DELETE);
     }
+
     private function getTableNameNormalizer(): StringNormalizerInterface
     {
         return new $this->tableNameNormalizerClass();
     }
+
+    abstract public static function find(): BaseQuery;
 
 }
