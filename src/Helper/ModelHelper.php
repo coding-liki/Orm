@@ -84,7 +84,7 @@ class ModelHelper
         return self::$modelRelations[$modelClass] ?? [];
     }
 
-    public static function getModelRelation(string $modelClass, string $fieldName): ?AbstractRelation
+    public static function getModelRelation(string $modelClass, ?string $fieldName): ?AbstractRelation
     {
         return self::getModelRelations($modelClass)[$fieldName] ?? NULL;
     }

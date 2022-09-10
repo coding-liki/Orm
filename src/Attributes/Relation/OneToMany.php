@@ -56,7 +56,7 @@ class OneToMany extends AbstractRelation
 
     public function afterPersistListener(AfterPersistEvent $event)
     {
-        if (!$this->canProcessEvent($event)) {
+        if (!$this->canProcessEvent($event, true)) {
             return;
         }
 

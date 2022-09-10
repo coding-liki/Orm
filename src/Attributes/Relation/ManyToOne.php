@@ -58,7 +58,7 @@ class ManyToOne extends AbstractRelation
 
     public function afterPersistListener(AfterPersistEvent $event)
     {
-        if (!$this->canProcessEvent($event)) {
+        if (!$this->canProcessEvent($event, true)) {
             return;
         }
 
@@ -76,11 +76,11 @@ class ManyToOne extends AbstractRelation
         if ($this->reverseField !== null) {
             try {
                 $relationEntity = ModelHelper::getEntityFieldValue($event->entity, $this->fieldName);
-                if($relationEntity){
+                if ($relationEntity) {
                     $event->entityManager->getEntityState($relationEntity);
                     $reverseArray = ModelHelper::getEntityFieldValue($relationEntity, $this->reverseField);
 
-                    if(!in_array($event->entity, $reverseArray)) {
+                    if (!in_array($event->entity, $reverseArray)) {
                         $reverseArray[] = $event->entity;
                         ModelHelper::setEntityFieldValue($relationEntity, $this->reverseField, $reverseArray);
                     }

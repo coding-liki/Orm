@@ -44,7 +44,9 @@ class EntityManager
         ModelHelper::extractAllForClass($entity::class);
         $state ?: $state = $this->guessEntityState($entity);
 
+
         EventSubSystem::dispatch(new BeforePersistEvent($this, $entity, $state));
+
         if ($state === EntityState::STATE_NEW) {
             isset($this->newEntityStates[$class][spl_object_hash($entity)])
                 ?: $this->newEntityStates[$class][spl_object_hash($entity)] = new EntityState($entity);
@@ -56,6 +58,7 @@ class EntityManager
 
             $entityState = $this->identifiedEntityStates[$class][$pk_hash];
         }
+
 
         $entityState->setState($state)->invalidateState();
 
@@ -103,6 +106,7 @@ class EntityManager
             $setter = $fieldSetters[$fieldName];
             $entity->$setter($modelData[$modelField->fieldName]);
         }
+
 
         $this->persist($entity, EntityState::STATE_FLUSHED);
 

@@ -34,13 +34,13 @@ abstract class AbstractRelation
     }
     public function isRelationProcessed(): bool
     {
-        if($this->relationProcessed){
-            $this->relationProcessed = false;
+        if(!$this->relationProcessed){
+            $this->relationProcessed = true;
 
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
 
     }
 }
