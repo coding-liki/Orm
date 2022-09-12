@@ -89,6 +89,7 @@ class ManyToOne extends AbstractRelation
 
             }
         }
+        $this->setUnprocessed();
     }
 
     public function beforeInvalidateStateListener(BeforeInvalidateStateEvent $event)

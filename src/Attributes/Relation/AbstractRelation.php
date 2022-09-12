@@ -32,9 +32,16 @@ abstract class AbstractRelation
     {
         return $event->entity::class === $this->fromModelClass && (!$checkProcessed || !$this->isRelationProcessed());
     }
+
+    public function setUnprocessed(): self
+    {
+        $this->relationProcessed = false;
+        return $this;
+    }
+
     public function isRelationProcessed(): bool
     {
-        if(!$this->relationProcessed){
+        if (!$this->relationProcessed) {
             $this->relationProcessed = true;
 
             return false;

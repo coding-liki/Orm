@@ -77,7 +77,7 @@ class OneToMany extends AbstractRelation
 
             }
         }
-
+        $this->setUnprocessed();
     }
 
     public function initDataByReflectionProperty(\ReflectionProperty $property): void

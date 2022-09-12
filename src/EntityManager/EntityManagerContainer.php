@@ -15,10 +15,13 @@ class EntityManagerContainer
     public static function add(
         string $modelsNamespace,
         string $dbName = DbContainer::DEFAULT_DB_NAME,
-        string $tablePrefix = ''
-    ): void
+        string $tablePrefix = '',
+        ?EntityManager $existedManager = null
+    ): EntityManager
     {
-        self::$entityManagers[$modelsNamespace] = new EntityManager(DbContainer::get($dbName), $tablePrefix);
+        self::$entityManagers[$modelsNamespace] = $existedManager ?? new EntityManager(DbContainer::get($dbName), $tablePrefix);
+
+        return  self::$entityManagers[$modelsNamespace];
     }
 
     public static function get(string $modelClass): ?EntityManager
