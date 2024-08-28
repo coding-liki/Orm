@@ -2,6 +2,7 @@
 
 namespace CodingLiki\Orm;
 
+use CodingLiki\DbModule\DbContainer;
 use CodingLiki\Orm\EntityManager\EntityManagerContainer;
 use CodingLiki\Orm\EntityManager\EntityState;
 use CodingLiki\Orm\EntityManager\Query\BaseQuery;
@@ -15,6 +16,8 @@ abstract class BaseModel
     protected static ?string $queryClass               = NULL;
     protected ?string        $tableName                = NULL;
     protected ?string        $tableNameNormalizerClass = CamelCaseToSnakeCaseNormalizer::class;
+
+    public const DATABASE_NAME = DbContainer::DEFAULT_DB_NAME;
 
     /**
      * @var string[]|string

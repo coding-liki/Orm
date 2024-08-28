@@ -42,8 +42,7 @@ class EntityManager
         $class = $entity::class;
 
         ModelHelper::extractAllForClass($entity::class);
-        $state ?: $state = $this->guessEntityState($entity);
-
+        $state ??= $this->guessEntityState($entity);
 
         EventSubSystem::dispatch(new BeforePersistEvent($this, $entity, $state));
 
@@ -57,6 +56,8 @@ class EntityManager
                 ?: $this->identifiedEntityStates[$class][$pk_hash] = new EntityState($entity);
 
             $entityState = $this->identifiedEntityStates[$class][$pk_hash];
+
+
         }
 
 
@@ -110,7 +111,7 @@ class EntityManager
 
         $this->persist($entity, EntityState::STATE_FLUSHED);
 
-        return $entity;
+        return $this->getEntityState($entity)->getEntity();
     }
 
     /**
@@ -246,7 +247,14 @@ class EntityManager
     {
 
         $identifiedEntityStates = $this->identifiedEntityStates[$entity::class] ?? [];
+//        print_r($identifiedEntityStates);
+
+//        return EntityState::STATE_FLUSHED;
         foreach ($identifiedEntityStates as $state) {
+//            print_r([
+//                'from state' => spl_object_hash($state->getEntity()),
+//                'to check' => spl_object_hash($entity)
+//            ]);
             if ($state->getEntity() === $entity) {
                 return EntityState::STATE_FLUSHED;
             }
